@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Liberu\SocialNetwork\Communities\Models\Community;
 use Liberu\SocialNetwork\Events\Models\Event;
 use Liberu\SocialNetwork\Profiles\Models\Profile;
+use App\Models\ProfilePreference;
 
 class FriendsClubServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,10 @@ class FriendsClubServiceProvider extends ServiceProvider
 
         Event::resolveRelationUsing('hobby', function (Event $event) {
             return $event->belongsTo(Hobby::class, 'hobby_id', 'id', 'hobby');
+        });
+
+        Profile::resolveRelationUsing('preferences', function (Profile $profile) {
+            return $profile->hasOne(ProfilePreference::class, 'profile_id', 'id');
         });
     }
 }
