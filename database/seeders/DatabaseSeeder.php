@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             TeamSeeder::class,
             RolesSeeder::class,
             UserSeeder::class,
+            HobbySeeder::class,
         ]);
-
     }
 }
