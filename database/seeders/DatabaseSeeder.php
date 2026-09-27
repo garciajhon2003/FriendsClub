@@ -20,5 +20,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             HobbySeeder::class,
         ]);
+
+        if (app()->isLocal()) {
+            $this->call(DemoDataSeeder::class);
+        }
     }
 }
