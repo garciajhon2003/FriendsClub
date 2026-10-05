@@ -60,6 +60,11 @@ final class HobbyCommunitiesExtension implements CommunitiesPageExtension
         ];
     }
 
+    public function fillForm(Community $community): array
+    {
+        return ['hobby_id' => $community->getAttribute('hobby_id')];
+    }
+
     public function saved(Community $community, array $data): void
     {
         $community->forceFill(['hobby_id' => $data['hobby_id'] ?? null])->save();

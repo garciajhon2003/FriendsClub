@@ -28,11 +28,14 @@ interface CommunitiesPageExtension
     /** @return list<BaseFilter> */
     public function filters(): array;
 
-    /** @return list<Field|Component> appended to the create form */
+    /** @return list<Field|Component> appended to the create and edit forms */
     public function formComponents(): array;
 
     /** @return list<Entry|Component> appended to the community details */
     public function detailEntries(): array;
+
+    /** @return array<string, mixed> extra form state when editing $community */
+    public function fillForm(Community $community): array;
 
     /** @param array<string, mixed> $data the submitted form state */
     public function saved(Community $community, array $data): void;

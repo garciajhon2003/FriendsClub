@@ -76,19 +76,24 @@ it('does not let someone remove another profile from a community', function () {
     expect(membershipRow($this->public, $this->member))->not->toBeNull();
 });
 
-it('lists private communities the viewer is an active member of', function () {
+it('lists private communities to everyone, so people can ask to join', function () {
+    actAs($this->member);
+
+    expect(app(ListCommunities::class)->handle($this->member)->modelKeys())
+        ->toContain($this->private->getKey(), $this->public->getKey());
+});
+
+it('keeps the inside of a private community for its active members', function () {
     actAs($this->member);
     app(JoinCommunity::class)->handle($this->member, $this->private);
 
-    expect(app(ListCommunities::class)->handle($this->member)->modelKeys())
-        ->not->toContain($this->private->getKey());
+    expect(Community::query()->visibleTo($this->member)->whereKey($this->private->getKey())->exists())->toBeFalse();
 
     DB::table('social_community_memberships')
         ->where(['community_id' => $this->private->getKey(), 'profile_id' => $this->member->getKey()])
         ->update(['status' => 'active']);
 
-    expect(app(ListCommunities::class)->handle($this->member)->modelKeys())
-        ->toContain($this->private->getKey(), $this->public->getKey());
+    expect(Community::query()->visibleTo($this->member)->whereKey($this->private->getKey())->exists())->toBeTrue();
 });
 
 it('does not list soft deleted communities to members', function () {

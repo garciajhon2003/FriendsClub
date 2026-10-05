@@ -49,8 +49,8 @@ it('calls communities clubs, in English and in Spanish', function () {
     Livewire::test(Communities::class)->assertSee('Nuevo club');
 });
 
-it('lists public communities and my own, but not other people private ones', function () {
-    $hidden = Community::query()->create([
+it('lists public and private communities, so private ones can be asked to join', function () {
+    $private = Community::query()->create([
         'id' => (string) Str::uuid(),
         'owner_profile_id' => Profile::query()->where('handle', 'laura')->value('id'),
         'name' => 'Club secreto',
@@ -60,7 +60,8 @@ it('lists public communities and my own, but not other people private ones', fun
 
     Livewire::test(Communities::class)
         ->assertCanSeeTableRecords(Community::query()->where('visibility', 'public')->get())
-        ->assertCanNotSeeTableRecords([$hidden]);
+        ->assertCanSeeTableRecords([$private])
+        ->assertTableActionVisible('join', $private);
 });
 
 it('creates a club through the module action with the FriendsClub fields', function () {

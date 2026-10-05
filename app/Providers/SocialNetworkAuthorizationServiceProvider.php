@@ -51,7 +51,16 @@ final class SocialNetworkAuthorizationServiceProvider extends ServiceProvider
                     return true;
                 }
 
-                return (string) $subject->getAttribute('user_id') === (string) $user->getAuthIdentifier();
+                $ownsProfile = (string) $subject->getAttribute('user_id') === (string) $user->getAuthIdentifier();
+
+                // With a second subject (the event, community, publication… acted on),
+                // owning the profile is not enough: the module gate also checks that
+                // object, e.g. that the event is yours. Deny strangers here, defer the rest.
+                if (count($arguments) > 1) {
+                    return $ownsProfile ? null : false;
+                }
+
+                return $ownsProfile;
             }
 
             if (is_int($subject) || is_string($subject)) {

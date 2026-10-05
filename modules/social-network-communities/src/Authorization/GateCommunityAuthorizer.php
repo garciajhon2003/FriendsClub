@@ -6,6 +6,7 @@ namespace Liberu\SocialNetwork\Communities\Authorization;
 
 use Illuminate\Support\Facades\Gate;
 use Liberu\SocialNetwork\Communities\Contracts\CommunityAuthorizer;
+use Liberu\SocialNetwork\Communities\Models\Community;
 use Liberu\SocialNetwork\Profiles\Models\Profile;
 
 final class GateCommunityAuthorizer implements CommunityAuthorizer
@@ -23,5 +24,10 @@ final class GateCommunityAuthorizer implements CommunityAuthorizer
     public function leave(Profile $member): void
     {
         Gate::authorize('social-network.communities.leave', [$member]);
+    }
+
+    public function manage(Profile $manager, Community $community): void
+    {
+        Gate::authorize('social-network.communities.manage', [$manager, $community]);
     }
 }

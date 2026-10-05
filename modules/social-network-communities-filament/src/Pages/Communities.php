@@ -6,8 +6,11 @@ namespace Liberu\SocialNetwork\Communities\Filament\Pages;
 
 use Closure;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -32,9 +35,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use Liberu\SocialNetwork\Communities\Actions\ApproveMembership;
 use Liberu\SocialNetwork\Communities\Actions\CreateCommunity;
 use Liberu\SocialNetwork\Communities\Actions\JoinCommunity;
 use Liberu\SocialNetwork\Communities\Actions\LeaveCommunity;
+use Liberu\SocialNetwork\Communities\Actions\RejectMembership;
+use Liberu\SocialNetwork\Communities\Actions\RemoveMember;
+use Liberu\SocialNetwork\Communities\Actions\UpdateCommunity;
 use Liberu\SocialNetwork\Communities\Enums\CommunityModality;
 use Liberu\SocialNetwork\Communities\Filament\Contracts\CommunitiesPageExtension;
 use Liberu\SocialNetwork\Communities\Models\Community;
@@ -68,6 +75,23 @@ final class Communities extends Page implements HasTable
     public static function getNavigationLabel(): string
     {
         return __('Communities');
+    }
+
+    /** Join requests waiting in the communities I own. */
+    public static function getNavigationBadge(): ?string
+    {
+        if (! auth()->check()) {
+            return null;
+        }
+
+        $pending = DB::table('social_community_memberships as request')
+            ->join('social_communities', 'social_communities.id', '=', 'request.community_id')
+            ->whereNull('social_communities.deleted_at')
+            ->where('social_communities.owner_profile_id', app(GetProfile::class)->forUser(auth()->id())->getKey())
+            ->where('request.status', 'pending')
+            ->count();
+
+        return $pending > 0 ? (string) $pending : null;
     }
 
     public function getTitle(): string
@@ -170,12 +194,122 @@ final class Communities extends Page implements HasTable
                         fn () => app(LeaveCommunity::class)->handle($this->viewer(), $record),
                         __('You left the community'),
                     )),
+                $this->managerActions(),
             ])
             ->defaultSort('name')
             ->emptyStateHeading(__('No communities yet'))
             ->emptyStateDescription(__('Create the first one with the “New community” button.'))
             ->paginated([10, 25, 50])
             ->defaultPaginationPageOption(10);
+    }
+
+    /** Edit the community and decide who is in it: only for its owner. */
+    private function managerActions(): ActionGroup
+    {
+        return ActionGroup::make([
+            EditAction::make()
+                ->schema(fn (Schema $schema): Schema => $schema->components($this->formComponents())->columns(2))
+                ->fillForm(fn (Community $record): array => [
+                    ...$record->only(['name', 'description', 'visibility', 'rules', 'modality', 'city', 'latitude', 'longitude', 'max_members', 'meeting_day', 'meeting_time']),
+                    ...array_merge(...array_map(fn (CommunitiesPageExtension $extension): array => $extension->fillForm($record), $this->extensions()) ?: [[]]),
+                ])
+                ->using(fn (Community $record, array $data): Community => $this->attempt(function () use ($record, $data): Community {
+                    $community = app(UpdateCommunity::class)->handle($this->viewer(), $record, $this->detailsFrom($data));
+
+                    foreach ($this->extensions() as $extension) {
+                        $extension->saved($community, $data);
+                    }
+
+                    return $community;
+                })),
+            Action::make('approveRequests')
+                ->label(__('Approve requests'))
+                ->icon('heroicon-o-check-badge')
+                ->color('success')
+                ->visible(fn (Community $record): bool => $this->memberIds($record, 'pending') !== [])
+                ->schema(fn (Community $record): array => [
+                    CheckboxList::make('profiles')
+                        ->label(__('Let in'))
+                        ->options(fn (): array => $this->memberOptions($record, 'pending'))
+                        ->bulkToggleable()
+                        ->required(),
+                ])
+                ->action(fn (Community $record, array $data) => $this->attempt(function () use ($record, $data): void {
+                    foreach ((array) $data['profiles'] as $profileId) {
+                        app(ApproveMembership::class)->handle($this->viewer(), $record, Profile::query()->findOrFail($profileId));
+                    }
+                }, __('Requests approved'))),
+            Action::make('declineRequests')
+                ->label(__('Decline requests'))
+                ->icon('heroicon-o-x-circle')
+                ->color('gray')
+                ->visible(fn (Community $record): bool => $this->memberIds($record, 'pending') !== [])
+                ->schema(fn (Community $record): array => [
+                    CheckboxList::make('profiles')
+                        ->label(__('Decline'))
+                        ->options(fn (): array => $this->memberOptions($record, 'pending'))
+                        ->required(),
+                ])
+                ->action(fn (Community $record, array $data) => $this->attempt(function () use ($record, $data): void {
+                    foreach ((array) $data['profiles'] as $profileId) {
+                        app(RejectMembership::class)->handle($this->viewer(), $record, Profile::query()->findOrFail($profileId));
+                    }
+                }, __('Requests declined'))),
+            Action::make('removeMember')
+                ->label(__('Remove a member'))
+                ->icon('heroicon-o-user-minus')
+                ->color('danger')
+                ->visible(fn (Community $record): bool => $this->memberOptions($record, 'active') !== [])
+                ->modalDescription(__('They will not be able to join again.'))
+                ->schema(fn (Community $record): array => [
+                    Select::make('profile')
+                        ->label(__('Member'))
+                        ->options(fn (): array => $this->memberOptions($record, 'active'))
+                        ->required(),
+                ])
+                ->action(fn (Community $record, array $data) => $this->attempt(
+                    fn () => app(RemoveMember::class)->handle($this->viewer(), $record, Profile::query()->findOrFail($data['profile'])),
+                    __('Member removed'),
+                )),
+        ])
+            ->label(__('Manage'))
+            ->icon('heroicon-o-cog-6-tooth')
+            ->button()
+            ->visible(fn (Community $record): bool => $record->my_role === 'owner');
+    }
+
+    /**
+     * The form state as CreateCommunity and UpdateCommunity expect it.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function detailsFrom(array $data): array
+    {
+        return [
+            'name' => $data['name'],
+            'description' => filled($data['description'] ?? null) ? $data['description'] : null,
+            'visibility' => $data['visibility'] ?? 'public',
+            'rules' => array_values($data['rules'] ?? []),
+            ...Arr::only($data, ['modality', 'city', 'latitude', 'longitude', 'max_members', 'meeting_day', 'meeting_time']),
+        ];
+    }
+
+    /** @return list<string> ids of the community's members in that status, the owner left out */
+    private function memberIds(Community $community, string $status): array
+    {
+        return DB::table('social_community_memberships')
+            ->where(['community_id' => $community->getKey(), 'status' => $status])
+            ->where('role', '!=', 'owner')
+            ->pluck('profile_id')
+            ->map(fn (mixed $id): string => (string) $id)
+            ->all();
+    }
+
+    /** @return array<string, string> profile id => name, for pickers */
+    private function memberOptions(Community $community, string $status): array
+    {
+        return app(ResolveDisplayNames::class)->handle($this->memberIds($community, $status));
     }
 
     protected function getHeaderActions(): array
@@ -187,13 +321,7 @@ final class Communities extends Page implements HasTable
                 ->icon('heroicon-o-plus')
                 ->schema(fn (Schema $schema): Schema => $schema->components($this->formComponents())->columns(2))
                 ->using(fn (array $data): Community => $this->attempt(function () use ($data): Community {
-                    $community = app(CreateCommunity::class)->handle($this->viewer(), [
-                        'name' => $data['name'],
-                        'description' => filled($data['description'] ?? null) ? $data['description'] : null,
-                        'visibility' => $data['visibility'] ?? 'public',
-                        'rules' => array_values($data['rules'] ?? []),
-                        ...Arr::only($data, ['modality', 'city', 'latitude', 'longitude', 'max_members', 'meeting_day', 'meeting_time']),
-                    ]);
+                    $community = app(CreateCommunity::class)->handle($this->viewer(), $this->detailsFrom($data));
 
                     foreach ($this->extensions() as $extension) {
                         $extension->saved($community, $data);
@@ -205,7 +333,8 @@ final class Communities extends Page implements HasTable
     }
 
     /**
-     * Same rule as ListCommunities (Community::visibleTo), with the
+     * Every community, like ListCommunities (private ones too, so people can ask
+     * to join), with the
      * member count and my membership added for the table.
      */
     private function visibleCommunities(): Builder
@@ -228,8 +357,7 @@ final class Communities extends Page implements HasTable
                     ->where('social_community_memberships.status', 'active'),
                 'my_status' => $myMembership('status'),
                 'my_role' => $myMembership('role'),
-            ])
-            ->visibleTo($this->viewer());
+            ]);
     }
 
     /** @return list<mixed> */
@@ -331,12 +459,14 @@ final class Communities extends Page implements HasTable
                     ]),
                     TextEntry::make('description')->placeholder('No description.')->columnSpanFull(),
                     TextEntry::make('rules')
+                        ->visible(fn (Community $record): bool => $this->canSeeInside($record))
                         ->listWithLineBreaks()
                         ->bulleted()
                         ->placeholder('No rules yet.')
                         ->columnSpanFull(),
                 ]),
             Section::make('Members')
+                ->visible(fn (Community $record): bool => $this->canSeeInside($record))
                 ->schema([
                     TextEntry::make('member_names')
                         ->hiddenLabel()
@@ -355,6 +485,12 @@ final class Communities extends Page implements HasTable
                         ->placeholder('No pending requests.'),
                 ]),
         ]);
+    }
+
+    /** A private community's members and rules are for its active members. */
+    private function canSeeInside(Community $record): bool
+    {
+        return $record->visibility === 'public' || $record->my_status === 'active';
     }
 
     private function membershipState(Community $record): ?string

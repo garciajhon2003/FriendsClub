@@ -4,6 +4,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Liberu\Foundation\Organizations\Models\Team;
+use Liberu\SocialNetwork\Communities\Models\Community;
+use Liberu\SocialNetwork\Events\Models\Event;
 use Liberu\SocialNetwork\Profiles\Models\Profile;
 
 it('denies unauthenticated social abilities and leaves other abilities untouched', function () {
@@ -64,4 +66,23 @@ it('still lets admins moderate reports', function () {
     $profile = new Profile(['user_id' => $admin->getKey()]);
 
     expect(Gate::forUser($admin)->allows('social-network.moderation.decide', [$profile]))->toBeTrue();
+});
+
+it('lets people manage their own events and communities, but not other people\'s', function () {
+    $person = function (): array {
+        $user = User::factory()->create();
+
+        return [$user, Profile::query()->create(['id' => (string) Str::uuid(), 'user_id' => $user->getKey(), 'handle' => Str::lower(Str::random(10))])];
+    };
+    [$ownerUser, $owner] = $person();
+    [$strangerUser, $stranger] = $person();
+
+    $event = Event::query()->create(['id' => (string) Str::uuid(), 'owner_profile_id' => $owner->id, 'title' => 'Ruta', 'starts_at' => now()->addDay(), 'state' => 'published', 'visibility' => 'public']);
+    $club = Community::query()->create(['id' => (string) Str::uuid(), 'owner_profile_id' => $owner->id, 'name' => 'Club', 'slug' => Str::lower(Str::random(10)), 'visibility' => 'public']);
+
+    foreach (['social-network.events.manage' => $event, 'social-network.communities.manage' => $club] as $ability => $subject) {
+        expect(Gate::forUser($ownerUser)->allows($ability, [$owner, $subject]))->toBeTrue()
+            ->and(Gate::forUser($strangerUser)->allows($ability, [$stranger, $subject]))->toBeFalse()
+            ->and(Gate::forUser($strangerUser)->allows($ability, [$owner, $subject]))->toBeFalse();
+    }
 });
