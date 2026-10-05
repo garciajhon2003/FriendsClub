@@ -23,7 +23,7 @@ class RolesSeeder extends Seeder
         // Roles are team-scoped (permission.teams=true). Create + query them
         // inside the default team's context. See CLAUDE.md tenancy rules.
         if (Utils::isTenancyEnabled()) {
-            $team = Team::firstOrFail();
+            $team = Team::where('name', 'Default')->firstOrFail();
             $roleData['team_id'] = $team->id;
             setPermissionsTeamId($team->id);
         }

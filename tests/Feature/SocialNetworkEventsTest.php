@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Liberu\SocialNetwork\Events\Actions\AddEventUpdate;
 use Liberu\SocialNetwork\Events\Actions\ListEvents;
+use Liberu\SocialNetwork\Events\Actions\PublishEvent;
 use Liberu\SocialNetwork\Events\Actions\SetAttendance;
 use Liberu\SocialNetwork\Events\Models\Event;
 use Liberu\SocialNetwork\Events\Models\EventUpdate;
@@ -53,6 +54,17 @@ it('does not leak private events and exposes them to invited profiles', function
 
     expect(app(ListEvents::class)->handle($viewer))->toHaveCount(1);
 });
+
+it('publishes only draft events', function (string $state): void {
+    $owner = eventProfile();
+    $event = publishedEvent($owner);
+    $event->update(['state' => $state]);
+    $this->actingAs($owner->user);
+
+    expect(fn (): mixed => app(PublishEvent::class)->handle($owner, $event))
+        ->toThrow(InvalidArgumentException::class, 'Only draft events can be published.')
+        ->and($event->refresh()->state)->toBe($state);
+})->with(['published', 'cancelled', 'completed']);
 
 it('enforces event capacity transactionally and permits event updates', function (): void {
     $owner = eventProfile();

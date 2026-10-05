@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schemas.liberu.dev/module/v1.json",
+  "name": "social-network-hobbies",
+  "display_name": "Social Network Hobbies",
+  "description": "Hobby catalog linking profiles, communities and events.",
+  "version": "0.1.0",
+  "category": "product",
+  "provider": "Liberu\\SocialNetwork\\Hobbies\\HobbiesServiceProvider",
+  "requires": {
+    "php": "^8.5",
+    "laravel": "^13.0",
+    "packages": {
+      "liberusoftware/module-social-network-communities": "^0.1",
+      "liberusoftware/module-social-network-events": "^0.1",
+      "liberusoftware/module-social-network-profiles": "^0.1"
+    }
+  },
+  "capabilities": [
+    "social-network.hobbies"
+  ],
+  "features": [
+    "Hobby catalog",
+    "Profile hobbies with level",
+    "Community and event hobby",
+    "Matching preferences"
+  ],
+  "default_enabled": true
+}

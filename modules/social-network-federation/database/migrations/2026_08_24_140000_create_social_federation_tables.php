@@ -10,7 +10,7 @@ return new class() extends Migration
     {
         Schema::create('social_federation_actors', function (Blueprint $t): void {
             $t->uuid('id')->primary();
-            $t->foreignUuid('profile_id')->constrained('profiles')->cascadeOnDelete();
+            $t->foreignUuid('profile_id')->constrained('social_profiles')->cascadeOnDelete();
             $t->string('handle', 190)->unique();
             $t->string('actor_url', 500)->unique();
             $t->string('inbox_url', 500);

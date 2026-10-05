@@ -1,1 +1,3 @@
-<x-filament-panels::page><div class="space-y-2">@foreach ($this->publications() as $publication)<div>{{ $publication->title ?: str($publication->body)->limit(80) }} — {{ $publication->state }}</div>@endforeach</div></x-filament-panels::page>
+<x-filament-panels::page>
+    {{ $this->table }}
+</x-filament-panels::page>

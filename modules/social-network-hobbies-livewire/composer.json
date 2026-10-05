@@ -1,0 +1,44 @@
+{
+  "name": "liberusoftware/module-social-network-hobbies-livewire",
+  "description": "Livewire adapter for Hobbies: a public directory to find communities by hobby, place and day.",
+  "type": "liberu-module",
+  "license": "MIT",
+  "version": "0.1.0",
+  "require": {
+    "php": "^8.5",
+    "livewire/livewire": "^4.0",
+    "liberusoftware/module-social-network-communities": "^0.1",
+    "liberusoftware/module-social-network-hobbies": "^0.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Liberu\\SocialNetwork\\Hobbies\\Livewire\\": "src/"
+    }
+  },
+  "extra": {
+    "liberu": {
+      "name": "social-network-hobbies-livewire"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "scripts": {
+    "test": "pest",
+    "test:unit": "pest tests/Unit",
+    "test:feature": "pest tests/Feature",
+    "test:coverage": "pest --coverage --min=100 --coverage-clover=coverage.xml",
+    "test:parallel": "pest --parallel"
+  },
+  "require-dev": {
+    "liberusoftware/package-testbench": "^1.7",
+    "pestphp/pest": "^5.0"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  }
+}

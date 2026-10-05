@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Hobby;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Liberu\SocialNetwork\Hobbies\Models\Hobby;
 
 class HobbySeeder extends Seeder
 {

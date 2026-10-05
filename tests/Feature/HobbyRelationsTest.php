@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\Hobby;
 use App\Models\User;
 use Database\Seeders\HobbySeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 use Liberu\SocialNetwork\Communities\Models\Community;
+use Liberu\SocialNetwork\Hobbies\Models\Hobby;
 use Liberu\SocialNetwork\Profiles\Models\Profile;
 
 use function Pest\Laravel\seed;
@@ -18,7 +18,7 @@ function hobbyProfile(): Profile
     return Profile::query()->create([
         'id' => (string) Str::uuid(),
         'user_id' => $user->getKey(),
-        'handle' => 'hobby-' . strtolower(substr((string) $user->getKey(), 0, 8)),
+        'handle' => 'hobby-'.strtolower(substr((string) $user->getKey(), 0, 8)),
     ]);
 }
 
@@ -28,7 +28,7 @@ function hobbyCommunity(Profile $owner, Hobby $hobby): Community
         'id' => (string) Str::uuid(),
         'owner_profile_id' => $owner->getKey(),
         'name' => 'Amantes de la Repostería',
-        'slug' => 'amantes-reposteria-' . Str::lower(Str::random(6)),
+        'slug' => 'amantes-reposteria-'.Str::lower(Str::random(6)),
     ]);
 
     $community->hobby()->associate($hobby)->save();
@@ -36,7 +36,7 @@ function hobbyCommunity(Profile $owner, Hobby $hobby): Community
     return $community;
 }
 
-beforeEach(fn() => seed(HobbySeeder::class));
+beforeEach(fn () => seed(HobbySeeder::class));
 
 it('attaches hobbies with a level to a profile', function () {
     $profile = hobbyProfile();
@@ -61,5 +61,5 @@ it('does not allow deleting a hobby that clubs are using', function () {
     $hobby = Hobby::where('slug', 'lectura')->first();
     hobbyCommunity(hobbyProfile(), $hobby);
 
-    expect(fn() => $hobby->delete())->toThrow(QueryException::class);
+    expect(fn () => $hobby->delete())->toThrow(QueryException::class);
 });

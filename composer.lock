@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b9c17cba532e9e3399c35bd4f430a4f6",
+    "content-hash": "ff78aef5dd8cc7051a47189eaa690c48",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -7651,6 +7651,191 @@
                 "MIT"
             ],
             "description": "Livewire adapter for Feed.",
+            "transport-options": {
+                "symlink": false,
+                "relative": true
+            }
+        },
+        {
+            "name": "liberusoftware/module-social-network-hobbies",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "modules/social-network-hobbies",
+                "reference": "81e234656a23779692dc9aa13282097ca4851d4c"
+            },
+            "require": {
+                "illuminate/database": "^13.0",
+                "illuminate/support": "^13.0",
+                "liberusoftware/module-social-network-communities": "^0.1",
+                "liberusoftware/module-social-network-events": "^0.1",
+                "liberusoftware/module-social-network-profiles": "^0.1",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.7",
+                "pestphp/pest": "^5.0"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "social-network-hobbies"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\SocialNetwork\\Hobbies\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:unit": [
+                    "pest tests/Unit"
+                ],
+                "test:feature": [
+                    "pest tests/Feature"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100 --coverage-clover=coverage.xml"
+                ],
+                "test:parallel": [
+                    "pest --parallel"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Hobby catalog: the hobbies of each profile, and the hobby of each community and event.",
+            "transport-options": {
+                "symlink": false,
+                "relative": true
+            }
+        },
+        {
+            "name": "liberusoftware/module-social-network-hobbies-filament",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "modules/social-network-hobbies-filament",
+                "reference": "5bd4032bb6a0ac8fd6eb26d17918718af4f19d54"
+            },
+            "require": {
+                "filament/filament": "^5.1",
+                "liberusoftware/module-social-network-communities": "^0.1",
+                "liberusoftware/module-social-network-communities-filament": "^0.1",
+                "liberusoftware/module-social-network-events": "^0.1",
+                "liberusoftware/module-social-network-events-filament": "^0.1",
+                "liberusoftware/module-social-network-hobbies": "^0.1",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.7",
+                "pestphp/pest": "^5.0"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "social-network-hobbies-filament"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\SocialNetwork\\Hobbies\\Filament\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:unit": [
+                    "pest tests/Unit"
+                ],
+                "test:feature": [
+                    "pest tests/Feature"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100 --coverage-clover=coverage.xml"
+                ],
+                "test:parallel": [
+                    "pest --parallel"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Filament adapter for Hobbies: the catalog, and the hobby on the Communities and Events pages.",
+            "transport-options": {
+                "symlink": false,
+                "relative": true
+            }
+        },
+        {
+            "name": "liberusoftware/module-social-network-hobbies-livewire",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "modules/social-network-hobbies-livewire",
+                "reference": "8da08b399e5d414b0ea48cf939189505eff01892"
+            },
+            "require": {
+                "liberusoftware/module-social-network-communities": "^0.1",
+                "liberusoftware/module-social-network-hobbies": "^0.1",
+                "livewire/livewire": "^4.0",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.7",
+                "pestphp/pest": "^5.0"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "social-network-hobbies-livewire"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\SocialNetwork\\Hobbies\\Livewire\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:unit": [
+                    "pest tests/Unit"
+                ],
+                "test:feature": [
+                    "pest tests/Feature"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100 --coverage-clover=coverage.xml"
+                ],
+                "test:parallel": [
+                    "pest --parallel"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Livewire adapter for Hobbies: a public directory to find communities by hobby, place and day.",
             "transport-options": {
                 "symlink": false,
                 "relative": true

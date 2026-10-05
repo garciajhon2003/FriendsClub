@@ -18,7 +18,7 @@ return new class() extends Migration
             $table->string('status', 16)->default('accepted');
             $table->string('visibility', 16)->default('followers');
             $table->timestamps();
-            $table->unique(['source_profile_id', 'target_profile_id', 'relationship_type']);
+            $table->unique(['source_profile_id', 'target_profile_id', 'relationship_type'], 'sgr_source_target_type_unique');
         });
         Schema::create('social_graph_lists', function (Blueprint $table): void {
             $table->uuid('id')->primary();

@@ -12,6 +12,6 @@ final class ListCommunities
 {
     public function handle(Profile $viewer, int $limit = 25): Collection
     {
-        return Community::query()->where('visibility', 'public')->orWhere('owner_profile_id', $viewer->getKey())->latest()->limit(max(1, min($limit, 100)))->get();
+        return Community::query()->visibleTo($viewer)->latest()->limit(max(1, min($limit, 100)))->get();
     }
 }

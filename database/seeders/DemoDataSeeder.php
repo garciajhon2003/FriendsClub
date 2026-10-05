@@ -2,15 +2,15 @@
 
 namespace Database\Seeders;
 
-use App\Enums\ClubModality;
-use App\Models\Hobby;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Liberu\SocialNetwork\Communities\Enums\CommunityModality;
 use Liberu\SocialNetwork\Communities\Models\Community;
 use Liberu\SocialNetwork\Communities\Models\Membership;
 use Liberu\SocialNetwork\Events\Models\Event;
+use Liberu\SocialNetwork\Hobbies\Models\Hobby;
 use Liberu\SocialNetwork\Profiles\Models\Profile;
 
 class DemoDataSeeder extends Seeder
@@ -34,6 +34,8 @@ class DemoDataSeeder extends Seeder
         $profiles = $this->seedPeople();
         $this->seedClubs($profiles);
         $this->seedEvents($profiles);
+
+        $this->call(SocialActivitySeeder::class);
     }
 
     /** @return array<string, Profile> */
@@ -98,12 +100,12 @@ class DemoDataSeeder extends Seeder
     {
         // [nombre, hobby, modalidad, ciudad, plazas, día (1=lunes…7=domingo), hora, miembros (el primero es el dueño)]
         $clubs = [
-            ['Amantes de la Repostería', 'reposteria', ClubModality::InPerson, 'Barcelona', 6, 7, '17:00', ['laura', 'marta', 'alejandra']],
-            ['Senderismo Juntos', 'senderismo', ClubModality::InPerson, 'Barcelona', 8, 6, '09:00', ['javier', 'alejandra']],
-            ['Fotografía Urbana', 'fotografia', ClubModality::Online, null, 12, 3, '19:00', ['carlos', 'sofia', 'alejandra', 'javier']],
-            ['Miniaturas y Dioramas', 'miniaturas', ClubModality::InPerson, 'Barcelona', 6, 4, '19:00', ['alejandra']],
-            ['Lecturas que Conectan', 'lectura', ClubModality::Online, null, 20, 2, '20:00', ['marta', 'carmen', 'lucia']],
-            ['Bienestar en Equilibrio', 'bienestar', ClubModality::InPerson, 'Valencia', 15, 7, '10:00', ['lucia']],
+            ['Amantes de la Repostería', 'reposteria', CommunityModality::InPerson, 'Barcelona', 6, 7, '17:00', ['laura', 'marta', 'alejandra']],
+            ['Senderismo Juntos', 'senderismo', CommunityModality::InPerson, 'Barcelona', 8, 6, '09:00', ['javier', 'alejandra']],
+            ['Fotografía Urbana', 'fotografia', CommunityModality::Online, null, 12, 3, '19:00', ['carlos', 'sofia', 'alejandra', 'javier']],
+            ['Miniaturas y Dioramas', 'miniaturas', CommunityModality::InPerson, 'Barcelona', 6, 4, '19:00', ['alejandra']],
+            ['Lecturas que Conectan', 'lectura', CommunityModality::Online, null, 20, 2, '20:00', ['marta', 'carmen', 'lucia']],
+            ['Bienestar en Equilibrio', 'bienestar', CommunityModality::InPerson, 'Valencia', 15, 7, '10:00', ['lucia']],
         ];
 
         foreach ($clubs as [$name, $hobby, $modality, $city, $max, $day, $time, $members]) {

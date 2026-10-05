@@ -11,4 +11,6 @@ interface CommunityAuthorizer
     public function create(Profile $owner): void;
 
     public function join(Profile $member): void;
+
+    public function leave(Profile $member): void;
 }

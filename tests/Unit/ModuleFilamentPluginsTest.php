@@ -19,7 +19,10 @@ it('composes enabled admin plugins from module manifests', function () {
 it('composes enabled application plugins from module manifests', function () {
     $ids = collect(app(ModulePlugins::class)->forPanel('app'))->map->getId()->all();
 
-    expect($ids)->toContain('liberu-sessions-devices');
+    expect($ids)
+        ->toContain('liberu-sessions-devices')
+        ->toContain('module-social-network-messaging-filament')
+        ->toContain('module-social-network-events-filament');
 });
 
 /**

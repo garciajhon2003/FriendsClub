@@ -1,1 +1,23 @@
-<x-filament-panels::page><form wire:submit="refresh"><label for="discovery-query">Search</label><input id="discovery-query" wire:model="query"><button type="submit">Search</button></form><div class="space-y-2">@foreach($this->results() as $result)<div>{{ $result->body }}</div>@endforeach</div></x-filament-panels::page>
+<x-filament-panels::page>
+    @php($trends = $this->trends())
+
+    @if ($trends !== [])
+        <x-filament::section heading="Trending" icon="heroicon-o-arrow-trending-up" compact>
+            <div style="display: flex; flex-wrap: wrap; gap: .5rem;">
+                @foreach ($trends as $term => $count)
+                    <x-filament::badge
+                        tag="button"
+                        type="button"
+                        :color="$this->tableSearch === (string) $term ? 'primary' : 'gray'"
+                        wire:click="searchFor(@js((string) $term))"
+                        style="cursor: pointer;"
+                    >
+                        #{{ $term }}
+                    </x-filament::badge>
+                @endforeach
+            </div>
+        </x-filament::section>
+    @endif
+
+    {{ $this->table }}
+</x-filament-panels::page>

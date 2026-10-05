@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Hobby;
 use Database\Seeders\HobbySeeder;
+use Liberu\SocialNetwork\Hobbies\Models\Hobby;
 
 use function Pest\Laravel\seed;
 

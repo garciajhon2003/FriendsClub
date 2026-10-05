@@ -21,7 +21,7 @@ final class MediaFilamentPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        $panel->pages([Pages\Assets::class]);
+        $panel->pages([Pages\Assets::class, Pages\Albums::class]);
     }
 
     public function boot(Panel $panel): void {}

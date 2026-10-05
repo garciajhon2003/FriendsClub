@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Liberu\SocialNetwork\Events\Actions;
 
 use Illuminate\Contracts\Events\Dispatcher;
+use InvalidArgumentException;
 use Liberu\SocialNetwork\Events\Contracts\EventsAuthorizer;
 use Liberu\SocialNetwork\Events\Events\EventPublished;
 use Liberu\SocialNetwork\Events\Models\Event;
@@ -20,6 +21,9 @@ final readonly class PublishEvent
     public function handle(Profile $owner, Event $event): Event
     {
         $this->authorizer->manage($owner, $event);
+        if ($event->state !== 'draft') {
+            throw new InvalidArgumentException('Only draft events can be published.');
+        }
         $event->update(['state' => 'published']);
         $event = $event->refresh();
         $this->events->dispatch(new EventPublished($event));

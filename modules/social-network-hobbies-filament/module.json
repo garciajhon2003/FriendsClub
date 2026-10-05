@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schemas.liberu.dev/module/v1.json",
+  "name": "social-network-hobbies-filament",
+  "display_name": "Social Network Hobbies Filament",
+  "description": "Filament adapter for Hobbies.",
+  "version": "0.1.0",
+  "category": "presentation",
+  "provider": "Liberu\\SocialNetwork\\Hobbies\\Filament\\HobbiesFilamentServiceProvider",
+  "requires": {
+    "php": "^8.5",
+    "laravel": "^13.0",
+    "packages": {
+      "liberusoftware/module-social-network-communities": "^0.1",
+      "liberusoftware/module-social-network-communities-filament": "^0.1",
+      "liberusoftware/module-social-network-events": "^0.1",
+      "liberusoftware/module-social-network-events-filament": "^0.1",
+      "liberusoftware/module-social-network-hobbies": "^0.1"
+    }
+  },
+  "presentation": {
+    "filament": {
+      "admin": [
+        "Liberu\\SocialNetwork\\Hobbies\\Filament\\HobbiesFilamentPlugin"
+      ]
+    }
+  },
+  "capabilities": [
+    "social-network.hobbies.filament"
+  ],
+  "default_enabled": true,
+  "features": [
+    "Hobby catalog administration",
+    "Hobby on the Communities page",
+    "Hobby on the Events page"
+  ]
+}

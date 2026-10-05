@@ -11,6 +11,20 @@ use Liberu\SocialNetwork\Profiles\Models\Profile;
 
 final class SocialNetworkAuthorizationServiceProvider extends ServiceProvider
 {
+    /**
+     * Abilities granted by role, not by owning what is passed to them. For the
+     * first two the profile is the actor, so the ownership rule below would let
+     * every member moderate reports or verify their own profile; analytics gets
+     * a metric name, which the team rule below would always deny, hiding it from
+     * holders of the "view analytics" permission. Their module gates decide.
+     */
+    private const ROLE_ABILITIES = [
+        'social-network.moderation.decide',
+        'social-network.profiles.verify',
+        'social-network.analytics.view',
+        'social-network.analytics.record',
+    ];
+
     public function boot(): void
     {
         Gate::before(function (?object $user, string $ability, array $arguments): ?bool {
@@ -24,6 +38,10 @@ final class SocialNetworkAuthorizationServiceProvider extends ServiceProvider
 
             if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
                 return true;
+            }
+
+            if (in_array($ability, self::ROLE_ABILITIES, true)) {
+                return null;
             }
 
             $subject = $arguments[0] ?? null;

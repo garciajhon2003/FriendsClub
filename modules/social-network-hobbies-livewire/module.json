@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schemas.liberu.dev/module/v1.json",
+  "name": "social-network-hobbies-livewire",
+  "display_name": "Social Network Hobbies Livewire",
+  "description": "Public directory of communities by hobby.",
+  "version": "0.1.0",
+  "category": "presentation",
+  "provider": "Liberu\\SocialNetwork\\Hobbies\\Livewire\\HobbiesLivewireServiceProvider",
+  "requires": {
+    "php": "^8.5",
+    "laravel": "^13.0",
+    "packages": {
+      "liberusoftware/module-social-network-communities": "^0.1",
+      "liberusoftware/module-social-network-hobbies": "^0.1"
+    }
+  },
+  "presentation": {
+    "livewire": [
+      "social-network-hobbies-explore"
+    ]
+  },
+  "capabilities": [
+    "social-network.hobbies.livewire"
+  ],
+  "default_enabled": true,
+  "features": [
+    "Explore communities by hobby, modality, day and place"
+  ]
+}

@@ -19,4 +19,9 @@ final class GateCommunityAuthorizer implements CommunityAuthorizer
     {
         Gate::authorize('social-network.communities.join', [$member]);
     }
+
+    public function leave(Profile $member): void
+    {
+        Gate::authorize('social-network.communities.leave', [$member]);
+    }
 }

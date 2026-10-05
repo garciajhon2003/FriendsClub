@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Liberu\Foundation\Organizations\Models\Team;
 use Liberu\SocialNetwork\Profiles\Models\Profile;
 
@@ -42,4 +43,25 @@ it('denies social abilities with unsupported subjects by default', function () {
     $user = User::factory()->create();
 
     expect(Gate::forUser($user)->allows('social-network.messaging.send', [new stdClass()]))->toBeFalse();
+});
+
+it('does not let members moderate reports or verify profiles just by owning their profile', function () {
+    $user = User::factory()->create();
+    $profile = Profile::query()->create([
+        'id' => (string) Str::uuid(),
+        'user_id' => $user->getKey(),
+        'handle' => 'plain-member',
+    ]);
+
+    expect(Gate::forUser($user)->allows('social-network.moderation.decide', [$profile]))->toBeFalse()
+        ->and(Gate::forUser($user)->allows('social-network.profiles.verify', [$profile]))->toBeFalse()
+        ->and(Gate::forUser($user)->allows('social-network.moderation.report', [$profile]))->toBeTrue();
+});
+
+it('still lets admins moderate reports', function () {
+    config(['app.admin_emails' => ['mod@example.com']]);
+    $admin = User::factory()->create(['email' => 'mod@example.com']);
+    $profile = new Profile(['user_id' => $admin->getKey()]);
+
+    expect(Gate::forUser($admin)->allows('social-network.moderation.decide', [$profile]))->toBeTrue();
 });

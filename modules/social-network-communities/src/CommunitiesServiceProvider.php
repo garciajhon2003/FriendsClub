@@ -24,6 +24,7 @@ final class CommunitiesServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         Gate::define('social-network.communities.create', fn (object $user, Profile $owner): bool => (string) $owner->user_id === (string) $user->getAuthIdentifier());
         Gate::define('social-network.communities.join', fn (object $user, Profile $member): bool => (string) $member->user_id === (string) $user->getAuthIdentifier());
+        Gate::define('social-network.communities.leave', fn (object $user, Profile $member): bool => (string) $member->user_id === (string) $user->getAuthIdentifier());
         Gate::define('social-network.communities.manage', fn (object $user, Profile $owner, Community $community): bool => (string) $owner->user_id === (string) $user->getAuthIdentifier() && (string) $community->owner_profile_id === (string) $owner->getKey());
     }
 }

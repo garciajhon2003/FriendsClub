@@ -30,6 +30,7 @@ final class PanelNavigation
             'Liberu\\SocialNetwork\\Events\\Filament\\Pages\\Events' => 'Communicate',
             'Liberu\\SocialNetwork\\Feed\\Filament\\Pages\\Entries' => 'Discover',
             'Liberu\\SocialNetwork\\Media\\Filament\\Pages\\Assets' => 'Create',
+            'Liberu\\SocialNetwork\\Media\\Filament\\Pages\\Albums' => 'Create',
             'Liberu\\SocialNetwork\\Messaging\\Filament\\Pages\\Conversations' => 'Communicate',
             'Liberu\\SocialNetwork\\Moderation\\Filament\\Pages\\Reports' => 'Moderation',
             'Liberu\\SocialNetwork\\Notifications\\Filament\\Pages\\Notifications' => 'Communicate',

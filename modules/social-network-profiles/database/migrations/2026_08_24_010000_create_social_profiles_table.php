@@ -29,7 +29,7 @@ return new class() extends Migration
             $table->foreignUuid('blocker_profile_id')->constrained('social_profiles')->cascadeOnDelete();
             $table->foreignUuid('blocked_profile_id')->constrained('social_profiles')->cascadeOnDelete();
             $table->timestamps();
-            $table->unique(['blocker_profile_id', 'blocked_profile_id']);
+            $table->unique(['blocker_profile_id', 'blocked_profile_id'], 'spb_blocker_blocked_unique');
         });
     }
 
