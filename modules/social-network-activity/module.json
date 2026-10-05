@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schemas.liberu.dev/module/v1.json",
+  "name": "social-network-activity",
+  "display_name": "Social Network Activity",
+  "description": "Connects the social network modules so that what happens in one reaches the others.",
+  "version": "0.1.0",
+  "category": "product",
+  "provider": "Liberu\\SocialNetwork\\Activity\\ActivityServiceProvider",
+  "requires": {
+    "php": "^8.5",
+    "laravel": "^13.0",
+    "packages": {
+      "liberusoftware/module-social-network-discovery": "^0.1",
+      "liberusoftware/module-social-network-feed": "^0.1",
+      "liberusoftware/module-social-network-profiles": "^0.1",
+      "liberusoftware/module-social-network-publishing": "^0.1",
+      "liberusoftware/module-social-network-social-graph": "^0.1"
+    }
+  },
+  "capabilities": [
+    "social-network.activity"
+  ],
+  "features": [
+    "Publications reach their audience's feeds",
+    "Publications are searchable",
+    "Deleted publications leave feeds and search"
+  ],
+  "default_enabled": true
+}

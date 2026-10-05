@@ -145,13 +145,38 @@ class PublicationFeedPresenter implements FeedItemPresenter
         app(CreateReport::class)->handle($viewer, $this->itemType(), $itemId, $reason, $details);
     }
 
-    /** Misma regla que ListPublications: publicadas y públicas, o mías. */
-    /** @return Builder<Publication> */
+    /**
+     * Publicadas y: públicas, mías, o para seguidores si sigo al autor o
+     * somos amigos (la misma audiencia a la que social-network-activity las
+     * reparte). ListPublications solo distingue públicas y mías.
+     *
+     * @return Builder<Publication>
+     */
     private function visibleTo(Profile $viewer): Builder
     {
+        $me = (string) $viewer->getKey();
+
         return Publication::query()
             ->where('state', 'published')
-            ->where(fn ($query) => $query->where('audience', 'public')->orWhere('author_profile_id', $viewer->getKey()));
+            ->where(fn ($query) => $query
+                ->where('audience', 'public')
+                ->orWhere('author_profile_id', $me)
+                ->orWhere(fn ($forFollowers) => $forFollowers
+                    ->where('audience', 'followers')
+                    ->whereExists(fn ($relation) => $relation
+                        ->selectRaw('1')
+                        ->from('social_graph_relationships')
+                        ->where('status', 'accepted')
+                        ->where(fn ($kind) => $kind
+                            ->where(fn ($follows) => $follows
+                                ->where('relationship_type', 'follow')
+                                ->where('source_profile_id', $me)
+                                ->whereColumn('target_profile_id', 'social_publications.author_profile_id'))
+                            ->orWhere(fn ($friends) => $friends
+                                ->where('relationship_type', 'friend')
+                                ->where(fn ($pair) => $pair
+                                    ->where(fn ($mine) => $mine->where('source_profile_id', $me)->whereColumn('target_profile_id', 'social_publications.author_profile_id'))
+                                    ->orWhere(fn ($theirs) => $theirs->where('target_profile_id', $me)->whereColumn('source_profile_id', 'social_publications.author_profile_id'))))))));
     }
 
     private function ensureVisible(Profile $viewer, string $itemId): void

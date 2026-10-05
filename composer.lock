@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ff78aef5dd8cc7051a47189eaa690c48",
+    "content-hash": "b0edd88461485d0256393e345735fe54",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -6401,6 +6401,71 @@
                 "issues": "https://github.com/liberusoftware/module-module-manager-filament/issues"
             },
             "time": "2026-08-07T14:25:35+00:00"
+        },
+        {
+            "name": "liberusoftware/module-social-network-activity",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "modules/social-network-activity",
+                "reference": "c2648c3af07967cd9e764b92119741b2ba3ddd98"
+            },
+            "require": {
+                "illuminate/database": "^13.0",
+                "illuminate/events": "^13.0",
+                "illuminate/support": "^13.0",
+                "liberusoftware/module-social-network-discovery": "^0.1",
+                "liberusoftware/module-social-network-feed": "^0.1",
+                "liberusoftware/module-social-network-profiles": "^0.1",
+                "liberusoftware/module-social-network-publishing": "^0.1",
+                "liberusoftware/module-social-network-social-graph": "^0.1",
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "liberusoftware/package-testbench": "^1.7",
+                "pestphp/pest": "^5.0"
+            },
+            "type": "liberu-module",
+            "extra": {
+                "liberu": {
+                    "name": "social-network-activity"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Liberu\\SocialNetwork\\Activity\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "pest"
+                ],
+                "test:unit": [
+                    "pest tests/Unit"
+                ],
+                "test:feature": [
+                    "pest tests/Feature"
+                ],
+                "test:coverage": [
+                    "pest --coverage --min=100 --coverage-clover=coverage.xml"
+                ],
+                "test:parallel": [
+                    "pest --parallel"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Connects the social network modules: reacts to what one module announces by acting in the others.",
+            "transport-options": {
+                "symlink": false,
+                "relative": true
+            }
         },
         {
             "name": "liberusoftware/module-social-network-analytics",
