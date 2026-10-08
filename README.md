@@ -1,57 +1,81 @@
-# Liberu Social Network
+# FriendsClub
 
-> An open, modular Laravel platform for building communities and social products you control.
+> Red social para conocer gente a través de sus hobbies: clubs, eventos, publicaciones y mensajes.
 
-[Software](https://liberusoftware.com) · [Hosting](https://liberuhosting.com) · [Services](https://liberuservices.com) · [Liberu Group](https://liberugroup.com)
+[![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)](https://www.php.net/) [![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)](https://laravel.com/) [![Filament](https://img.shields.io/badge/Filament-5-FDAE4B)](https://filamentphp.com/) [![Livewire](https://img.shields.io/badge/Livewire-4-FB70A9)](https://livewire.laravel.com/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
 
-[![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)](https://www.php.net/) [![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)](https://laravel.com/) [![Filament](https://img.shields.io/badge/Filament-5-FDAE4B)](https://filamentphp.com/) [![Livewire](https://img.shields.io/badge/Livewire-4-FB70A9)](https://livewire.laravel.com/)
+FriendsClub está construido sobre [Liberu Social Network](https://github.com/liberusoftware/social-network-laravel), una plataforma Laravel modular y de código abierto. Este repositorio añade lo propio de FriendsClub (hobbies, clubs con ubicación y horario, la página pública *Explorar*) y las pantallas que hacen usable la red social desde el panel de miembros.
 
-[![Install](https://github.com/liberusoftware/social-network-laravel/actions/workflows/install.yml/badge.svg?branch=main)](https://github.com/liberusoftware/social-network-laravel/actions/workflows/install.yml) [![Tests](https://github.com/liberusoftware/social-network-laravel/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/liberusoftware/social-network-laravel/actions/workflows/tests.yml) [![Docker](https://github.com/liberusoftware/social-network-laravel/actions/workflows/docker.yml/badge.svg?branch=main)](https://github.com/liberusoftware/social-network-laravel/actions/workflows/docker.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
+## Qué se puede hacer
 
-## What it is
+Todo esto está en el panel de miembros, en `/app`:
 
-Liberu Social Network is a self-hostable social platform and reference application. It gives teams a working foundation for launching a public community, private network, creator product, membership service, or specialised social experience without rebuilding the core social primitives from scratch.
+| Sección | Qué permite |
+|---|---|
+| **Feed** (portada) | Ver lo que publican las personas que sigues y tus amigos; reaccionar, comentar, reportar, ocultar y ordenar por relevancia o por fecha |
+| **Publications** | Escribir posts y artículos con menciones, hashtags, enlaces y encuestas; publicar ya, programar o guardar como borrador |
+| **Communities** (clubs) | Clubs por hobby, presenciales u online, con ciudad, día, hora y plazas. Los privados se piden y el dueño aprueba o rechaza; el dueño edita su club y expulsa miembros |
+| **Events** | Crear eventos, publicarlos, invitar, confirmar asistencia respetando el cupo, avisos a asistentes y recordatorios |
+| **Conversations** | Chat privado y en grupo con reacciones, mensajes cifrados y contador de no leídos |
+| **Notifications** | Bandeja con marcar como leída, descartar y preferencias (canales, horas de silencio, resumen) |
+| **Engagements** | Tu actividad: reacciones, comentarios, compartidos y guardados, con editar y deshacer |
+| **Media / Albums** | Subir fotos, vídeos y archivos y organizarlos en álbumes públicos, de amigos o privados |
+| **Search** | Buscador con tendencias, por tipo y popularidad |
+| **Relationships, Lists, Blocks, Suggestions** | Seguir, amistades, listas de personas, bloqueos y sugerencias |
+| **Reports** | Los miembros reportan contenido; los administradores deciden en la cola de moderación |
+| **Analytics** | Solo administradores: métricas con cifras, gráfico de evolución y periodos |
 
-The application is built from independently versioned Composer modules. Product capabilities, APIs, Livewire interactions, Filament administration, and themes can evolve independently while the host application supplies configuration and integration.
+Además, la página pública **Explorar** permite buscar clubs por hobby, modalidad, día y distancia.
 
-## Product capabilities
+### Cómo se conecta todo
 
-The current product modules cover:
+Las secciones se comunican entre sí a través del módulo `social-network-activity`:
 
-- Profiles with handles, bios, avatars, verification, visibility, and blocking
-- Follows, friendship requests, lists, suggestions, and relationship visibility
-- Home and following timelines with cursors, ranking, and visibility filters
-- Posts, articles, drafts, audiences, mentions, hashtags, polls, links, and scheduling
-- Reactions, comments, replies, sharing, bookmarks, counters, and abuse limits
-- Private conversations with membership, delivery/read state, attachments, safety, and retention controls
-- Events with invitations, attendance, capacity, locations, schedules, reminders, and updates
-- Images, video, audio, files, processing, accessibility metadata, rights, delivery, and private albums
-- Communities with groups, memberships, roles, rules, feeds, questions, files, and moderation boundaries
-- Privacy-aware search, hashtags, trends, recommendations, and directories
-- Reports, evidence, moderation decisions, appeals, sanctions, and transparency records
-- In-app, email, and push notification preferences, grouping, digests, quiet hours, and read state
-- ActivityPub-compatible identity, inbox, outbox, and delivery primitives
-- Privacy-governed analytics for growth, engagement, retention, health, delivery, and moderation
+- Al **publicar**, la publicación llega al feed del autor, de sus seguidores y de sus amigos, respetando la audiencia elegida y los bloqueos, y se indexa en el buscador. También las programadas, cuando salen a su hora.
+- Al **borrar** una publicación, desaparece de todos los feeds y del buscador.
 
-The platform also includes authentication, two-factor authentication, roles and permissions, organisations, audit trails, API access, feature flags, settings, localisation, files, webhooks, queues, scheduling, observability, and theme support.
+## Cómo está organizado
 
-## Stack
+El proyecto es un *anfitrión* que compone módulos. Casi todo el código vive en `modules/`, no en `app/`:
 
-| Dependency | Version |
+```text
+modules/
+├── social-network-<dominio>            # lógica y datos: acciones, modelos, permisos
+├── social-network-<dominio>-filament   # las pantallas del panel /app
+├── social-network-<dominio>-livewire   # componentes sueltos para páginas públicas
+├── social-network-<dominio>-api        # API HTTP
+├── social-network-hobbies*             # el catálogo de hobbies (propio de FriendsClub)
+├── social-network-activity             # conecta los módulos entre sí
+└── …                                   # módulos de base: identidad, ajustes, búsqueda…
+themes/                                 # temas visuales
+app/                                    # composición: lo que une módulos que no se conocen
+```
+
+Reglas que sigue el código:
+
+- **Las pantallas nunca guardan nada por su cuenta:** siempre llaman a una *acción* del módulo (`CreateEvent`, `ApproveMembership`…), que valida los datos y comprueba los permisos.
+- **Un módulo no depende de `app/`.** Cuando la composición necesita añadir algo a una pantalla de un módulo (por ejemplo, el hobby en eventos y clubs), lo hace mediante un *punto de extensión*: un contrato que el módulo define y que otro paquete implementa.
+- **Lo nuevo se hace como módulo**, no en `app/`.
+
+Más detalle en [docs/MODULE_DEVELOPMENT.md](docs/MODULE_DEVELOPMENT.md) y en [CLAUDE.md](CLAUDE.md).
+
+## Requisitos
+
+| Dependencia | Versión |
 |---|---|
 | PHP | 8.5 |
 | Laravel | 13.x |
 | Filament | 5.x |
 | Livewire | 4.x |
 | Composer | 2.x |
-| Node.js | Current supported release |
-| Database | A Laravel-supported SQL database |
+| Node.js | Una versión con soporte actual |
+| Base de datos | MySQL u otra soportada por Laravel |
 
-## Quick start
+## Instalación
 
 ```bash
-git clone https://github.com/liberusoftware/social-network-laravel.git
-cd social-network-laravel
+git clone https://github.com/garciajhon2003/FriendsClub.git
+cd FriendsClub
 
 composer install
 cp .env.example .env
@@ -61,95 +85,46 @@ npm install
 npm run build
 
 php artisan migrate
-php artisan serve
+php artisan storage:link
 ```
 
-Configure the database, mail, application URL, and external integrations in `.env` before running migrations. Use `php artisan migrate --seed` when you want available example data.
+Configura la base de datos, el correo y la URL de la aplicación en `.env` antes de migrar.
 
-For interactive setup, run:
+**En Windows:** Composer pide la extensión `pcntl`, que solo existe en Linux. Añade `--ignore-platform-req=ext-pcntl --ignore-platform-req=ext-posix` a `composer install` o `composer update`.
+
+### Datos de ejemplo
+
+Para ver la red social con contenido (personas, clubs, eventos, publicaciones, conversaciones…):
 
 ```bash
-bash install.sh
+php artisan db:seed --class="Database\Seeders\DemoDataSeeder" --force
 ```
 
-## How the modules fit together
+Los usuarios de ejemplo entran con su correo, como `laura@friendsclub.test`, y la contraseña `password`. **No lo ejecutes en un servidor con usuarios reales:** también añade actividad de ejemplo a todas las cuentas existentes.
 
-The host application composes three kinds of package:
-
-```text
-modules/
-├── social-network-*   # social product domains and API/UI adapters
-├── *                  # shared foundation capabilities
-themes/                # replaceable visual themes
-app/                   # host-specific composition and integration
-config/                # application and module policy
-tests/                 # cross-module application tests
-```
-
-Each social domain is separated from its presentation adapters. For example, the publishing domain can be used through its API, Livewire composer, or Filament administration package. This keeps domain rules reusable across web, mobile, and partner integrations.
-
-Modules are enabled from their manifests and can be adjusted for a deployment through `MODULES_ENABLED` and `MODULES_DISABLED`. Inspect the installed capability catalog with:
+## Pruebas
 
 ```bash
-php artisan module:features
-php artisan module:features health
-php artisan module:status search
+vendor/bin/pest                                   # todas (tarda más de 10 minutos)
+vendor/bin/pest tests/Feature/FeedPageTest.php    # las de una pantalla
+vendor/bin/pint                                   # formato del código
 ```
 
-Installed module and theme directories are tracked so deployments and reviews contain the exact package contents used by the application. Composer remains the source of package versions and dependency resolution. Generic module changes belong in the module repository; host-specific composition belongs here.
+Cada pantalla tiene su archivo de pruebas en `tests/Feature/`. Las pruebas usan una base de datos SQLite en memoria, así que no tocan la tuya.
 
-## APIs and administration
+Fallo conocido: en Windows, `ThemeManagerTest` y `ThemeServiceProviderTest` fallan porque esperan rutas con `/` y Windows usa `\`.
 
-Versioned API adapters are provided for the social product domains and use Laravel Sanctum authentication. API routes live in the relevant `social-network-*-api` modules, keeping HTTP concerns out of domain packages.
+## Pendiente
 
-Filament 5 provides administration surfaces for profiles, relationships, publishing, communities, events, media, messaging, moderation, analytics, and network settings. Livewire 4 provides interactive web surfaces such as timelines, composers, conversations, profiles, notifications, and relationship controls.
+Lo más importante que falta:
 
-## Themes
+- Que **seguir, reaccionar, comentar, enviar mensajes** o ser aceptado en un club generen **notificaciones**.
+- Que los **bloqueos** se respeten también al seguir y en los mensajes.
+- Poder **dejar de seguir** y **quitar amigos**.
+- Que al empezar a seguir a alguien aparezcan sus publicaciones anteriores en el feed, y que eventos y clubs también lleguen al feed y al buscador.
+- Ejecutar las **decisiones de moderación** (hoy solo se anotan) y **calcular las métricas** de forma automática.
+- Mensajes y notificaciones **en tiempo real** (hoy las páginas se refrescan solas cada 15 o 30 segundos).
 
-Themes are replaceable packages under `themes/`. The base theme defines shared contracts and fallback behaviour; the default, dark, and clear-signal themes provide application presentations. See [theme architecture](docs/THEME_ARCHITECTURE.md) and [theme system](docs/THEME_SYSTEM.md) for extension guidance.
+## Licencia y créditos
 
-## Testing and quality
-
-```bash
-composer validate --strict
-vendor/bin/pest
-vendor/bin/pint --test
-npm run build
-```
-
-The test suite covers cross-domain behaviour, module providers, API boundaries, presentation integration, and architecture rules. See [module development](docs/MODULE_DEVELOPMENT.md) before adding or changing a package.
-
-## Documentation
-
-- [Module development](docs/MODULE_DEVELOPMENT.md)
-- [Foundation module matrix](docs/FOUNDATION_MODULE_MATRIX.md)
-- [Messaging](docs/MESSAGING.md)
-- [Messaging architecture](docs/MESSAGING_ARCHITECTURE.md)
-- [Search functionality](docs/SEARCH_FUNCTIONALITY.md)
-- [Search architecture](docs/SEARCH_ARCHITECTURE.md)
-- [Notifications](docs/NOTIFICATIONS.md)
-- [Localisation](docs/MULTI_LANGUAGE.md)
-- [Theme architecture](docs/THEME_ARCHITECTURE.md)
-- [Theme system](docs/THEME_SYSTEM.md)
-
-## Publishing component repositories
-
-The publishing helper derives component repository names from directories under `modules/` and `themes/`:
-
-```bash
-scripts/publish-components
-scripts/publish-components --create
-scripts/publish-components --push
-```
-
-Push mode requires a clean, committed worktree and authenticated GitHub access. It publishes component repositories as subtree splits and never force-updates an existing non-fast-forward history.
-
-## Contributing
-
-Bug reports, focused improvements, documentation, translations, tests, and new social capabilities are welcome. Keep changes scoped, follow existing module boundaries, and include tests for user-visible behaviour. Search existing issues before opening a new one.
-
-Do not report security vulnerabilities in public issues. Email `security@liberusoftware.com` with reproduction details and the affected version.
-
-## License
-
-Liberu Social Network is open-source software released under the [MIT License](LICENSE.md).
+FriendsClub es software de código abierto bajo la [licencia MIT](LICENSE.md). Está basado en [Liberu Social Network](https://github.com/liberusoftware/social-network-laravel), © Liberu Software, también bajo licencia MIT.
